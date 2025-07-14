@@ -1,0 +1,25 @@
+{
+  "name": "ledger-cli",
+  "displayName": "ledger-cli",
+  "description": "ledger-cli.org lanugage support",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.102.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "ledger",
+      "aliases": ["ledger", "Ledger"],
+      "extensions": [".ledger"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "ledger",
+      "scopeName": "source.ledger",
+      "path": "./syntaxes/ledger.tmLanguage"
+    }]
+  }
+}
