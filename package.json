@@ -7,19 +7,31 @@
     "vscode": "^1.102.0"
   },
   "categories": [
-    "Programming Languages"
+    "Programming Languages",
+    "Formatters"
   ],
   "contributes": {
-    "languages": [{
-      "id": "ledger",
-      "aliases": ["ledger", "Ledger"],
-      "extensions": [".ledger"],
-      "configuration": "./language-configuration.json"
-    }],
-    "grammars": [{
-      "language": "ledger",
-      "scopeName": "source.ledger",
-      "path": "./syntaxes/ledger.tmLanguage"
-    }]
+    "languages": [
+      {
+        "id": "ledger",
+        "aliases": [
+          "Ledger"
+        ],
+        "extensions": [
+          ".ledger"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ledger",
+        "scopeName": "source.ledger",
+        "path": "./syntaxes/ledger.tmLanguage"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.102.0"
   }
 }
