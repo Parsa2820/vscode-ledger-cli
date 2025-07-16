@@ -10,3 +10,13 @@
 ### 0.0.1
 
 Initial release
+
+---
+
+## Developer Notes
+Package the extension using:
+
+```bash
+vsce package
+```
+
