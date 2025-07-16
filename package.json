@@ -2,7 +2,12 @@
   "name": "ledger-cli",
   "displayName": "ledger-cli",
   "description": "ledger-cli.org lanugage support",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/parsa2820/vscode-ledger-cli.git"
+  },
   "version": "0.0.1",
+  "publisher": "parsa2820",
   "engines": {
     "vscode": "^1.102.0"
   },
