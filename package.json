@@ -35,6 +35,12 @@
         "scopeName": "source.ledger",
         "path": "./syntaxes/ledger.tmLanguage"
       }
+    ],
+    "commands": [
+      {
+        "command": "ledger.transactionStatusCycle",
+        "title": "Cycle Transaction Status"
+      }
     ]
   },
   "scripts": {
