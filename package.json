@@ -41,6 +41,14 @@
         "command": "ledger.transactionStatusCycle",
         "title": "Cycle Transaction Status"
       }
+    ],
+    "keybindings": [
+      {
+        "command": "ledger.transactionStatusCycle",
+        "key": "ctrl+shift+t",
+        "mac": "cmd+shift+t",
+        "when": "editorTextFocus && resourceExtname == '.ledger'"
+      }
     ]
   },
   "scripts": {
