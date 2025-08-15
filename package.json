@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/parsa2820/vscode-ledger-cli.git"
   },
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "parsa2820",
   "engines": {
     "vscode": "^1.102.0"

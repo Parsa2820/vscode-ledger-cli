@@ -11,12 +11,7 @@
 
 Initial release
 
----
+### 0.0.2
 
-## Developer Notes
-Package the extension using:
-
-```bash
-vsce package
-```
-
+- Improved formatting
+- Added transaction status cycling command
