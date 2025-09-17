@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { LedgerDocumentFormatter } from './formatter';
 import { registerCommands } from './commands';
+import { LedgerAccountCompletion } from './completion';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -8,6 +9,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const formatterRegistration = vscode.languages.registerDocumentFormattingEditProvider('ledger', new LedgerDocumentFormatter());
 	context.subscriptions.push(formatterRegistration);
+
+	const completionRegistration = vscode.languages.registerCompletionItemProvider('ledger', new LedgerAccountCompletion());
+	context.subscriptions.push(completionRegistration);
 
 	registerCommands(context);
 }

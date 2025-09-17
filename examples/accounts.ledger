@@ -1,0 +1,6 @@
+account Assets:Cash
+account Assets:Bank
+account Expenses:Food
+account Income:Salary
+account Liabilities:CreditCard
+account Equity:OpeningBalances

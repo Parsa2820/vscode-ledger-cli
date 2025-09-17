@@ -49,7 +49,20 @@
         "mac": "cmd+shift+t",
         "when": "editorTextFocus && resourceExtname == '.ledger'"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "ledger-cli",
+      "properties": {
+        "ledger.accountFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "List of ledger files to include for account auto-completion."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
