@@ -10,7 +10,7 @@ export class LedgerAccountCompletion implements vscode.CompletionItemProvider {
       accountFiles.push(defaultAccountsFile);
     }
     accountFiles.forEach(file => {
-      this.loadAccountFile(file).then(accounts => {
+      this.loadAccountFile(this.resolveFilePath(file)).then(accounts => {
         this.accounts.push(...accounts);
       });
     });
@@ -22,6 +22,19 @@ export class LedgerAccountCompletion implements vscode.CompletionItemProvider {
 
   resolveCompletionItem?(item: vscode.CompletionItem, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CompletionItem> {
     throw new Error('Method not implemented.');
+  }
+
+  private resolveFilePath(file: string) {
+    if (file.startsWith('~')) {
+      const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+      return file.replace('~', homeDir);
+    } else if (!file.startsWith('/') && !file.match(/^[a-zA-Z]:\\/)) {
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+      if (workspaceFolders && workspaceFolders.length > 0) {
+        return vscode.Uri.joinPath(workspaceFolders[0].uri, file).fsPath;
+      }
+    }
+    return file;
   }
 
   private async loadAccountFile(filePath: string): Promise<string[]> {
