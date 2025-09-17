@@ -4,14 +4,8 @@
 
 - Syntax highlighting
 - Formatter
+- Auto-completion for accounts
 
 ## Release Notes
 
-### 0.0.1
-
-Initial release
-
-### 0.0.2
-
-- Improved formatting
-- Added transaction status cycling command
+See [CHANGELOG.md](CHANGELOG.md)
