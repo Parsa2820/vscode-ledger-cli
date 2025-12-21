@@ -2,24 +2,85 @@
   "name": "ledger-cli",
   "displayName": "ledger-cli",
   "description": "ledger-cli.org lanugage support",
-  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/parsa2820/vscode-ledger-cli.git"
+  },
+  "version": "0.0.3",
+  "publisher": "parsa2820",
   "engines": {
     "vscode": "^1.102.0"
   },
   "categories": [
-    "Programming Languages"
+    "Programming Languages",
+    "Formatters"
   ],
+  "main": "./out/extension.js",
   "contributes": {
-    "languages": [{
-      "id": "ledger",
-      "aliases": ["ledger", "Ledger"],
-      "extensions": [".ledger"],
-      "configuration": "./language-configuration.json"
-    }],
-    "grammars": [{
-      "language": "ledger",
-      "scopeName": "source.ledger",
-      "path": "./syntaxes/ledger.tmLanguage"
-    }]
+    "languages": [
+      {
+        "id": "ledger",
+        "aliases": [
+          "Ledger"
+        ],
+        "extensions": [
+          ".ledger"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ledger",
+        "scopeName": "source.ledger",
+        "path": "./syntaxes/ledger.tmLanguage"
+      }
+    ],
+    "commands": [
+      {
+        "command": "ledger.transactionStatusCycle",
+        "title": "Cycle Transaction Status"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "ledger.transactionStatusCycle",
+        "key": "ctrl+shift+t",
+        "mac": "cmd+shift+t",
+        "when": "editorTextFocus && resourceExtname == '.ledger'"
+      }
+    ],
+    "configuration": {
+      "title": "ledger-cli",
+      "properties": {
+        "ledger.accountFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "List of ledger files to include for account auto-completion."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.102.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2"
   }
 }
