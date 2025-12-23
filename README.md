@@ -5,6 +5,7 @@
 - Syntax highlighting
 - Formatter
 - Auto-completion for accounts
+- Snippets for common ledger entries
 
 ## Release Notes
 

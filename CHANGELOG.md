@@ -14,3 +14,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [0.0.3] - 2025-09-17
 - Implemented account auto completion
+
+## [0.0.4] - TBD
+- Added snippets for common ledger entries

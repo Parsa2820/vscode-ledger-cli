@@ -1,0 +1,11 @@
+{
+    "Ledger Transaction": {
+        "prefix": ["ledger-transaction", "transaction"],
+        "body": [
+            "$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE * ${1:Description}",
+            "  ${2:Account1}  ${3:Amount} ${4:Currency}",
+            "  ${5:Account2}"
+        ],
+        "description": "Template for a Ledger transaction entry"
+    }
+}

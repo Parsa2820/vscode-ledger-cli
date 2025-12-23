@@ -62,7 +62,13 @@
           "description": "List of ledger files to include for account auto-completion."
         }
       }
-    }
+    },
+    "snippets": [
+      {
+        "language": "ledger",
+        "path": "./snippets/ledger.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
