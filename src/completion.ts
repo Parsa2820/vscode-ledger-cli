@@ -1,30 +1,74 @@
 import * as vscode from 'vscode';
 
 export class LedgerAccountCompletion implements vscode.CompletionItemProvider {
-  accounts: string[] = [];
+  private accounts: Set<string> = new Set();
+  private disposables: vscode.Disposable[] = [];
 
-  constructor() {
-    const defaultAccountsFile = vscode.Uri.joinPath(vscode.extensions.getExtension('parsa2820.ledger-cli')!.extensionUri, 'examples', 'accounts.ledger').fsPath;
-    const accountFiles = vscode.workspace.getConfiguration('ledger').get<string[]>('accountFiles', []);
-    if (accountFiles.length === 0) {
-      accountFiles.push(defaultAccountsFile);
-    }
-    accountFiles.forEach(file => {
-      this.loadAccountFile(this.resolveFilePath(file)).then(accounts => {
-        this.accounts.push(...accounts);
-      });
+  constructor(context: vscode.ExtensionContext) {
+    // Initial load
+    this.loadAllAccounts();
+
+    // Watch for configuration changes
+    const configWatcher = vscode.workspace.onDidChangeConfiguration((event) => {
+      if (event.affectsConfiguration('ledger.accountFiles')) {
+        this.loadAllAccounts();
+      }
     });
+    this.disposables.push(configWatcher);
+
+    // Watch for .ledger file changes in workspace
+    const fileWatcher = vscode.workspace.createFileSystemWatcher('**/*.ledger', false, false, false);
+    fileWatcher.onDidChange(() => this.loadAllAccounts());
+    fileWatcher.onDidCreate(() => this.loadAllAccounts());
+    fileWatcher.onDidDelete(() => this.loadAllAccounts());
+    this.disposables.push(fileWatcher);
+
+    context.subscriptions.push(...this.disposables);
+  }
+
+  private async loadAllAccounts(): Promise<void> {
+    const newAccounts = new Set<string>();
+
+    // Find all .ledger files in workspace
+    const ledgerFiles = await vscode.workspace.findFiles('**/*.ledger', '**/node_modules/**', 1000);
+
+    // Load from found files
+    for (const fileUri of ledgerFiles) {
+      const accounts = await this.loadAccountFile(fileUri.fsPath);
+      accounts.forEach(account => newAccounts.add(account));
+    }
+
+    // Also load from configured account files
+    const configuredFiles = vscode.workspace.getConfiguration('ledger').get<string[]>('accountFiles', []);
+    for (const file of configuredFiles) {
+      const resolvedPath = this.resolveFilePath(file);
+      const accounts = await this.loadAccountFile(resolvedPath);
+      accounts.forEach(account => newAccounts.add(account));
+    }
+
+    // Load default accounts file if no files found
+    if (newAccounts.size === 0 && ledgerFiles.length === 0 && configuredFiles.length === 0) {
+      const extension = vscode.extensions.getExtension('parsa2820.ledger-cli');
+      if (extension) {
+        const defaultAccountsFile = vscode.Uri.joinPath(extension.extensionUri, 'examples', 'accounts.ledger').fsPath;
+        const accounts = await this.loadAccountFile(defaultAccountsFile);
+        accounts.forEach(account => newAccounts.add(account));
+      }
+    }
+
+    this.accounts = newAccounts;
+    console.log(`Ledger: Loaded ${this.accounts.size} accounts`);
   }
 
   provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionList<vscode.CompletionItem> | vscode.CompletionItem[]> {
-    return this.accounts.map(account => new vscode.CompletionItem(account, vscode.CompletionItemKind.Variable));
+    return Array.from(this.accounts).map(account => new vscode.CompletionItem(account, vscode.CompletionItemKind.Variable));
   }
 
   resolveCompletionItem?(item: vscode.CompletionItem, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CompletionItem> {
     throw new Error('Method not implemented.');
   }
 
-  private resolveFilePath(file: string) {
+  private resolveFilePath(file: string): string {
     if (file.startsWith('~')) {
       const homeDir = process.env.HOME || process.env.USERPROFILE || '';
       return file.replace('~', homeDir);
@@ -42,19 +86,19 @@ export class LedgerAccountCompletion implements vscode.CompletionItemProvider {
       const fileUri = vscode.Uri.file(filePath);
       const fileData = await vscode.workspace.fs.readFile(fileUri);
       const fileText = Buffer.from(fileData).toString('utf8');
-      return this.loadAccounts(fileText);
+      return this.parseAccounts(fileText);
     } catch (error) {
-      console.error(`Error reading account file ${filePath}:`, error);
+      console.debug(`Error reading account file ${filePath}:`, error);
       return [];
     }
   }
 
-  private loadAccounts(fileText: string): string[] {
+  private parseAccounts(fileText: string): string[] {
     const accounts: string[] = [];
     const lines = fileText.split(/\r?\n/);
     for (const line of lines) {
       if (this.isAccountDeclarationLine(line)) {
-        const account = this.extractAccountDeclarationLineEntry(line);
+        const account = this.extractAccountName(line);
         if (account) {
           accounts.push(account);
         }
@@ -64,11 +108,11 @@ export class LedgerAccountCompletion implements vscode.CompletionItemProvider {
   }
 
   private isAccountDeclarationLine(text: string): boolean {
-    return this.getAccountDeclarationPattern().test(text);
+    return this.getAccountPattern().test(text);
   }
 
-  private extractAccountDeclarationLineEntry(text: string): string | null {
-    const pattern = this.getAccountDeclarationPattern();
+  private extractAccountName(text: string): string | null {
+    const pattern = this.getAccountPattern();
     const match = pattern.exec(text);
     if (match && match.groups) {
       return match.groups['account'].trim();
@@ -76,7 +120,7 @@ export class LedgerAccountCompletion implements vscode.CompletionItemProvider {
     return null;
   }
 
-  private getAccountDeclarationPattern(): RegExp {
+  private getAccountPattern(): RegExp {
     const accountNamePattern = /(?<account>[\[\(]?[A-Za-z0-9:_\-]+)[\]\)]?/;
     const commentPattern = /\s*(?<comment>[;#%\|\*].*)?/;
     return new RegExp(
@@ -85,5 +129,9 @@ export class LedgerAccountCompletion implements vscode.CompletionItemProvider {
       commentPattern.source +
       "$"
     );
+  }
+
+  dispose(): void {
+    this.disposables.forEach(d => d.dispose());
   }
 }
