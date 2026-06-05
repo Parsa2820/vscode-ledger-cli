@@ -61,6 +61,10 @@ export class LedgerAccountCompletion implements vscode.CompletionItemProvider {
   }
 
   provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionList<vscode.CompletionItem> | vscode.CompletionItem[]> {
+    if (!this.isAccountCompletionContext(document, position)) {
+      return [];
+    }
+
     return Array.from(this.accounts).map(account => new vscode.CompletionItem(account, vscode.CompletionItemKind.Variable));
   }
 
@@ -91,6 +95,38 @@ export class LedgerAccountCompletion implements vscode.CompletionItemProvider {
       console.debug(`Error reading account file ${filePath}:`, error);
       return [];
     }
+  }
+
+  private isAccountCompletionContext(document: vscode.TextDocument, position: vscode.Position): boolean {
+    const lineText = document.lineAt(position.line).text;
+    const prefix = lineText.slice(0, position.character);
+
+    if (!prefix.trim()) {
+      return false;
+    }
+
+    const trimmedPrefix = prefix.trimStart();
+    if (
+      trimmedPrefix.startsWith(';') ||
+      trimmedPrefix.startsWith('#') ||
+      trimmedPrefix.startsWith('%') ||
+      trimmedPrefix.startsWith('|') ||
+      trimmedPrefix.startsWith('*')
+    ) {
+      return false;
+    }
+
+    const directiveMatch = trimmedPrefix.match(/^(?:[@!]?(?:A|account|apply account|bucket|capture))\s+(.+)$/);
+    if (directiveMatch) {
+      return !/\s/.test(directiveMatch[1]);
+    }
+
+    if (!/^\s+/.test(prefix)) {
+      return false;
+    }
+
+    const postingPrefix = prefix.replace(/^\s+/, '');
+    return !/\s/.test(postingPrefix);
   }
 
   private parseAccounts(fileText: string): string[] {
